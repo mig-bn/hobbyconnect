@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      # Monta el código fuente para hot reload
+      - .:/app
+      # Volumen anónimo: protege los node_modules del contenedor
+      # para que no sean sobreescritos por el host
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      # Escucha en todas las interfaces (necesario en Docker)
+      - HOSTNAME=0.0.0.0
+      # Polling de archivos: obligatorio en Windows/WSL2 para hot reload
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped
